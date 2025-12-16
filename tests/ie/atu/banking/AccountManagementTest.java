@@ -57,6 +57,9 @@ class AccountManagementTest {
     public static void afterAllTests() {
         assertEquals(3, bankingApp.getNumberOfAccounts());
         assertEquals(33000, bankingApp.getTotalDeposits());
+        assertEquals(10000, bankingApp.getBalanceOfAccountHolder("Example1"));
+        assertEquals(20000, bankingApp.getBalanceOfAccountHolder("Example2"));
+        assertEquals(3000, bankingApp.getBalanceOfAccountHolder("John Doe"));
 
     }
 }
