@@ -2,9 +2,8 @@ package ie.atu.banking;
 
 import ie.atu.banking.exceptions.InsufficientFundsException;
 import ie.atu.banking.exceptions.LoanOverpaymentException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +26,7 @@ class AccountTest {
     // Now we are going to test each of the methods provided by the account class
     // Get account holder name
     @Test
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
     void getAccountHolder() {
         String expectedName = "Example Name";
         assertEquals(expectedName, testAccount.getAccountHolder());
@@ -35,6 +35,7 @@ class AccountTest {
     }
 
     @Test
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
     void accountBalanceAndExceptions() throws InsufficientFundsException {
         double accountBalance = 10000;
         assertEquals(accountBalance, testAccount.getBalance());

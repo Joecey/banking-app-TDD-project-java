@@ -1,10 +1,12 @@
 package ie.atu.banking;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import ie.atu.banking.exceptions.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class LoanHandlingTest {
     // Make a static BankingApp that can be accessed by all tests
     // This is static as no test instance has been created
@@ -22,11 +24,23 @@ class LoanHandlingTest {
     }
 
     @Test
-    void testAnotherTest() {
+    @Order(1)
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
+    void addLoanToAnAccount() {
 
-        // ACTUAL TESTS DOWN HERE
-        String expected = "Hello World2";
-        String actual = "Hello World2";
-        assertEquals(expected, actual);
+    }
+    @Test
+    @Order(2)
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
+    void repayLoanForAccount() {
+
+    }
+
+//     After all the tests, check to see if the account size and total bank deposit size is as expected
+    @AfterAll
+    public static void afterAllTests() {
+        assertEquals(2, bankingApp.getNumberOfAccounts());
+        assertEquals(33000, bankingApp.getTotalDeposits());
+
     }
 }

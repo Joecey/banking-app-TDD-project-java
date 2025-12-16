@@ -1,5 +1,6 @@
 package ie.atu.banking;
 
+import ie.atu.banking.exceptions.AccountDoesNotExist;
 import ie.atu.banking.exceptions.IncorrectFundParameters;
 import ie.atu.banking.exceptions.InsufficientFundsException;
 import ie.atu.banking.exceptions.LoanOverpaymentException;
@@ -24,15 +25,18 @@ public class BankingApp {
     // Constructor to initialize the banking application
     // If there are initialAccounts, create the bank with these accounts loaded
     public BankingApp(Account[] initialAccounts) {
+        System.out.println("Initializing BankingApp with " + initialAccounts.length + " accounts");
         if (initialAccounts.length == 0) {
             accounts = new ArrayList<>();
             totalDeposits = 0;
-
         } else {
+            totalDeposits = 0;
             for (Account acc : initialAccounts) {
+                System.out.println("Account: " + acc.getAccountHolder() + " with balance: " + acc.getBalance());
                 totalDeposits += acc.getBalance();
             }
             accounts = new ArrayList<>(List.of(initialAccounts));
+            System.out.println("Total deposits after initialization: " + totalDeposits);
         }
     }
 
@@ -81,14 +85,17 @@ public class BankingApp {
      *
      * @param accountHolder The name of the account holder.
      * @param amount        The deposit amount.
-     * @return True if the deposit is successful, otherwise false.
+     * @return The new account balance after the deposit
+     * @throws AccountDoesNotExist     if the account does not exist
+     * @throws IncorrectFundParameters if the amount is not positive
      */
-    public boolean depositToAccountHolder(String accountHolder, double amount) {
+    public double depositToAccountHolder(String accountHolder, double amount) {
         Account account = findAccount(accountHolder);
-        if (account == null || amount <= 0) return false;
+        if (account == null) throw new AccountDoesNotExist("This account does not exist");
+        if (amount <= 0) throw new IncorrectFundParameters("Incorrect parameters for deposit");
         account.deposit(amount);
         totalDeposits += amount;
-        return true;
+        return account.getBalance();
     }
 
     /**
@@ -96,12 +103,16 @@ public class BankingApp {
      *
      * @param accountHolder The name of the account holder.
      * @param amount        The withdrawal amount.
-     * @return True if the withdrawal is successful, otherwise false.
+     * @return The new account balance after the withdrawal
+     * @throws AccountDoesNotExist        if the account does not exist
+     * @throws IncorrectFundParameters    if the amount is not positive
+     * @throws InsufficientFundsException if the account has insufficient funds
      */
-    public double withdrawToAccountHolder(String accountHolder, double amount) throws InsufficientFundsException, IncorrectFundParameters {
+    public double withdrawToAccountHolder(String accountHolder, double amount)
+            throws AccountDoesNotExist, InsufficientFundsException, IncorrectFundParameters {
         Account account = findAccount(accountHolder);
-        if (account == null || amount <= 0) throw new IncorrectFundParameters("Incorrect parameters for withdrawal");
-
+        if (account == null) throw new AccountDoesNotExist("This account does not exist");
+        if (amount <= 0) throw new IncorrectFundParameters("Incorrect parameters for withdrawal");
         // attempt to withdraw, handling errors as needed
         try {
             account.withdraw(amount);
@@ -117,14 +128,17 @@ public class BankingApp {
      *
      * @param accountHolder The name of the account holder.
      * @param loanAmount    The loan amount.
-     * @return True if the loan is approved, otherwise false.
+     * @return The updated Account object after loan approval
+     * @throws AccountDoesNotExist     if the account does not exist
+     * @throws IncorrectFundParameters if the loan amount exceeds available deposits
      */
-    public boolean approveLoanForAccountHolder(String accountHolder, double loanAmount) {
+    public Account approveLoanForAccountHolder(String accountHolder, double loanAmount) throws AccountDoesNotExist, IncorrectFundParameters {
         Account account = findAccount(accountHolder);
-        if (account == null || loanAmount > totalDeposits) return false;
+        if (account == null) throw new AccountDoesNotExist("This account does not exist");
+        if (loanAmount > totalDeposits) throw new IncorrectFundParameters("Incorrect parameters for loan approval");
         account.approveLoan(loanAmount);
         totalDeposits -= loanAmount;
-        return true;
+        return account;
     }
 
     /**
@@ -132,12 +146,15 @@ public class BankingApp {
      *
      * @param accountHolder The name of the account holder.
      * @param amount        The repayment amount.
-     * @return True if the repayment is successful, otherwise false.
+     * @return The remaining loan amount after repayment
+     * @throws AccountDoesNotExist      if the account does not exist
+     * @throws IncorrectFundParameters  if the amount is not positive
+     * @throws LoanOverpaymentException if the repayment amount exceeds the loan balance
      */
-    public double repayLoanForAccountHolder(String accountHolder, double amount) throws IncorrectFundParameters, LoanOverpaymentException {
+    public double repayLoanForAccountHolder(String accountHolder, double amount) throws AccountDoesNotExist, IncorrectFundParameters, LoanOverpaymentException {
         Account account = findAccount(accountHolder);
-        if (account == null || amount <= 0)
-            throw new IncorrectFundParameters("Incorrect parameters for loan repayment ");
+        if (account == null) throw new AccountDoesNotExist("This account does not exist");
+        if (amount <= 0) throw new IncorrectFundParameters("Incorrect parameters for loan repayment");
 
         // attempt to repay loan, handle errors as needed
         try {
@@ -163,7 +180,7 @@ public class BankingApp {
      * Gets the balance of a specific account holder.
      *
      * @param accountHolder The name of the account holder.
-     * @return The balance if the account exists, otherwise null.
+     * @return The account balance if the account exists, otherwise null.
      */
     public Double getBalanceOfAccountHolder(String accountHolder) {
         Account account = findAccount(accountHolder);
@@ -174,7 +191,7 @@ public class BankingApp {
      * Gets the loan amount of a specific account holder.
      *
      * @param accountHolder The name of the account holder.
-     * @return The loan amount if the account exists, otherwise null.
+     * @return The current loan amount if the account exists, otherwise null.
      */
     public Double getLoanOfAccountHolder(String accountHolder) {
         Account account = findAccount(accountHolder);

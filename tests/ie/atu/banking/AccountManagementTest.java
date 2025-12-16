@@ -2,14 +2,10 @@ package ie.atu.banking;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import java.util.concurrent.TimeUnit;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AccountManagementTest {
     // Make a static BankingApp that can be accessed by all tests
     // This is static as no test instance has been created
@@ -26,6 +22,7 @@ class AccountManagementTest {
     }
 
     @Test
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
     void findingAccountAndGettingDetails() {
         Account foundAccount;
         foundAccount = bankingApp.findAccount("Example1");
@@ -40,6 +37,7 @@ class AccountManagementTest {
     }
 
     @Test
+    @Timeout(value = 500, unit = TimeUnit.MILLISECONDS)
     void addingAccount() {
         bankingApp.addAccount("John Doe", 3000);
         Account foundAccount = bankingApp.findAccount("John Doe");
