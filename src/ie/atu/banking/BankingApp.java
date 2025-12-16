@@ -22,6 +22,20 @@ public class BankingApp {
     private double totalDeposits; // Tracks total deposits in the bank
 
     // Constructor to initialize the banking application
+    // If there are initialAccounts, create the bank with these accounts loaded
+    public BankingApp(Account[] initialAccounts) {
+        if (initialAccounts.length == 0) {
+            accounts = new ArrayList<>();
+            totalDeposits = 0;
+
+        } else {
+            for (Account acc : initialAccounts) {
+                totalDeposits += acc.getBalance();
+            }
+            accounts = new ArrayList<>(List.of(initialAccounts));
+        }
+    }
+
     public BankingApp() {
         accounts = new ArrayList<>();
         totalDeposits = 0;
@@ -33,13 +47,22 @@ public class BankingApp {
      * @param accountHolder The name of the account holder.
      * @return The Account object if found, otherwise null.
      */
-    private Account findAccount(String accountHolder) {
+    protected Account findAccount(String accountHolder) {
         for (Account account : accounts) {
             if (account.getAccountHolder().equals(accountHolder)) {
                 return account;
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the number of accounts in the banking application.
+     *
+     * @return The number of accounts in the banking application.
+     */
+    protected int getNumberOfAccounts() {
+        return accounts.size();
     }
 
     /**

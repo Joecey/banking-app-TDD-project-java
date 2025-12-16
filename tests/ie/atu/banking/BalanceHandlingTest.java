@@ -6,15 +6,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BalanceHandlingTest {
-    // Make a static account that can be accessed by all tests
+    // Make a static BankingApp that can be accessed by all tests
     // This is static as no test instance has been created
-    private static Account account;
+    public static BankingApp bankingApp;
 
-    // Update the account variable with an account that will be used for all the BankingApp tests
+    // Creating banking app with initial accounts
     @BeforeAll
     public static void createAccountClassForTests() throws Exception {
-        System.out.println("Running balance handling tests...");
-        account = new Account("Example Name", 10000);
+        Account account1 = new Account("Example1", 10000);
+        Account account2 = new Account("Example2", 20000);
+
+        Account[] initialAccounts = new Account[]{account1, account2};
+        bankingApp = new BankingApp(initialAccounts);
     }
 
     @Test
